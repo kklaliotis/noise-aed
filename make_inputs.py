@@ -37,7 +37,8 @@ for i in range(1,19):
     print(f"Matched file: {matched_file} for pattern {pattern} in basename {basename}")
 
     if matched_file is None:
-        raise FileNotFoundError(f"No matching file found in {noise_dir} for pattern {pattern}")
+        print(f"Warning: No matching file found in {noise_dir} for pattern {pattern}. Skipping.")
+        continue  # skip to the next iteration
 
     # Read both FITS files
     with fits.open(sci_filename) as hdul1, fits.open(matched_file) as hdul2:
