@@ -40,19 +40,26 @@ for i in range(1,19):
         print(f"Warning: No matching file found in {noise_dir} for pattern {pattern}. Skipping.")
         continue  # skip to the next iteration
 
-    # Read both FITS files
     with fits.open(sci_filename) as hdul1, fits.open(matched_file) as hdul2:
         sci = hdul1['SCI'].data.astype(np.float32)
-        noise = hdul2['PRIMARY'].data.astype(np.float32)[4:4092, 4:4092] * 1.458 * 50 # times gain and N_frames
+        noise = hdul2['PRIMARY'].data.astype(np.float32)[4:4092, 4:4092] * 1.458 * 50  # gain * N_frames
         header = hdul1[0].header
 
     # Sum the images
     summed = sci + noise
 
-    # Write out the result
+    # Create HDUs
+    primary_hdu = fits.PrimaryHDU(summed, header=header)
+    sci_hdu = fits.ImageHDU(sci, name='SCI')
+    noise_hdu = fits.ImageHDU(noise, name='NOISE')
+
+    # Combine into HDUList
+    hdulist = fits.HDUList([primary_hdu, sci_hdu, noise_hdu])
+
+    # Write out the file
     out_name = f"Roman_WAS_Noise_H158_{pattern}.fits"
     out_path = os.path.join(out_dir, out_name)
-    fits.writeto(out_path, summed, header=header, overwrite=True)
+    hdulist.writeto(out_path, overwrite=True)
 
     print(f"Saved summed image to {out_path}")
 
