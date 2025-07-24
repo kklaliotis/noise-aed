@@ -18,7 +18,7 @@ sci_path_prefix = '/fs/scratch/PCON0003/cond0007/anl-run-in-prod/simple/Roman_WA
 noise_dir = '/fs/scratch/PCON0003/cond0007/anl-run-in-prod/labnoise'
 out_dir = '/fs/scratch/PCON0003/klaliotis/noise-aed/inputs'
 
-for i in range(19):
+for i in range(1,19):
     sci_filename = sci_path_prefix + str(i) + '.fits'
     basename = os.path.basename(sci_filename)
 
