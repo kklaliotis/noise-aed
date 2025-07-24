@@ -59,9 +59,9 @@ class PatchDataset(Dataset):
         return torch.tensor(patch, dtype=torch.float32).unsqueeze(0)  # (1, 64, 64)
 
 # Hard code for now -- make configurable later
-darks_path = "/path/to/darks"
-science_path = "/path/to/science"
-pmask_path = "/path/to/pmask"
+darks_path = "/fs/scratch/PCON0003/cond0007/anl-run-in-prod/labnoise"
+science_path = "/fs/scratch/PCON0003/klaliotis/aeds/inputs"
+pmask_path = "/users/PCON0003/cond0007/imcom/coadd-test-fall2022/permanent_mask_220730.fits"
 skip_obs = [670]
 patch_size = 128
 stride = 64
