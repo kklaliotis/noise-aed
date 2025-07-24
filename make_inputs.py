@@ -50,7 +50,7 @@ for i in range(1,19):
     summed = sci + noise
 
     # Write out the result
-    out_name = f"summed_{pattern}.fits"
+    out_name = f"Roman_WAS_Noise_H158_{pattern}.fits"
     out_path = os.path.join(out_dir, out_name)
     fits.writeto(out_path, summed, header=header, overwrite=True)
 
