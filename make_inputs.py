@@ -41,8 +41,8 @@ for i in range(1,19):
 
     # Read both FITS files
     with fits.open(sci_filename) as hdul1, fits.open(matched_file) as hdul2:
-        sci = hdul1['SCI'].data.astype(np.float32)[4:4092, 4:4092]  # Crop to 4088x4088
-        noise = hdul2['PRIMARY'].data.astype(np.float32) * 1.458 * 50 # times gain and N_frames
+        sci = hdul1['SCI'].data.astype(np.float32)
+        noise = hdul2['PRIMARY'].data.astype(np.float32)[4:4092, 4:4092] * 1.458 * 50 # times gain and N_frames
         header = hdul1[0].header
 
     # Sum the images
