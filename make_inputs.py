@@ -22,7 +22,7 @@ for i in range(1,19):
     sci_filename = sci_path_prefix + str(i) + '.fits'
     basename = os.path.basename(sci_filename)
 
-    match = re.search(r'(670)_(\d+)', basename)
+    match = re.search(r'(670)_(1[0-9]|[1-9])\.fits$', basename)
     if not match:
         raise ValueError(f"No 'number_number' pattern found in filename: {basename}")
     pattern = f"{match.group(1)}_{match.group(2)}"
