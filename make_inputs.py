@@ -16,7 +16,7 @@ Parameters:
 
 sci_path_prefix = '/fs/scratch/PCON0003/cond0007/anl-run-in-prod/simple/Roman_WAS_simple_model_670_'
 noise_dir = '/fs/scratch/PCON0003/cond0007/anl-run-in-prod/labnoise'
-out_dir = '/fs/scratch/PCON0003/klaliotis/aeds/inputs'
+out_dir = '/fs/scratch/PCON0003/klaliotis/noise-aed/inputs'
 
 for i in range(19):
     sci_filename = sci_path_prefix + str(i) + '.fits'

@@ -60,7 +60,7 @@ class PatchDataset(Dataset):
 
 # Hard code for now -- make configurable later
 darks_path = "/fs/scratch/PCON0003/cond0007/anl-run-in-prod/labnoise"
-science_path = "/fs/scratch/PCON0003/klaliotis/aeds/inputs"
+science_path = "/fs/scratch/PCON0003/klaliotis/noise-aed/inputs"
 pmask_path = "/users/PCON0003/cond0007/imcom/coadd-test-fall2022/permanent_mask_220730.fits"
 skip_obs = [670]
 patch_size = 128
