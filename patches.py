@@ -32,7 +32,7 @@ def apply_object_mask(image, mask=None, threshold_factor=2.5, inplace=False):
         image_out = np.where(neighbor_mask, 0, image)
         return image_out, neighbor_mask
 
-def extract_patches_from_image(image, scaid, patch_size=64, stride=32, normalize=True, science=False, mask_path=None):
+def extract_patches_from_image(image, scaid, patch_size=64, stride=32, normalize=False, science=False, mask_path=None):
     """
     Extract overlapping patches from a 2D image array.
     
@@ -50,7 +50,7 @@ def extract_patches_from_image(image, scaid, patch_size=64, stride=32, normalize
         patches (list of 2D np.ndarrays)
     """
     patches = []
-    assert image.shape == (4096, 4224), "Image must be 4096x4224 pixels"
+    assert image.shape == (4096, 4224), "Image must be 4096x4224 pixels. Current shape: {}".format(image.shape)
 
     if mask_path:
         mask = fits.open(mask_path)[0].data[int(scaid) - 1].astype(bool)
@@ -90,28 +90,40 @@ def load_fits_images_and_extract_patches(dir, skip_obs=[670], patch_size=64, str
     Returns:
         patches_array (np.ndarray): All extracted patches, shape (N, patch_size, patch_size)
     """
-    nfiles=0
-    files = sorted(glob(os.path.join(dir, "*.fits")))
-    if max_files:
-        files = files[:max_files]
-    
     all_patches = []
-    for filepath in files:
-        m = re.match(r'.*?_(\d+)_([0-9]+)\.fits', filepath)
+
+    if not science:
+        nfiles=0
+        files = sorted(glob(os.path.join(dir, "*.fits")))
+        if max_files:
+            files = files[:max_files]
+        
+        
+        for filepath in files:
+            m = re.match(r'.*?_(\d+)_([0-9]+)\.fits', filepath)
+            if m:
+                obsid=m.group(1)
+                scaid=m.group(2)
+        
+            if int(obsid) not in skip_obs:
+                nfiles+=1
+                with fits.open(filepath) as hdul:
+                    image = hdul['PRIMARY'].data.astype(np.float32)
+                    patches = extract_patches_from_image(image, scaid, patch_size, stride, science=science, mask_path=mask_path)
+                    all_patches.extend(patches)
+            
+        print(f"Extracted {len(all_patches)} patches from {nfiles} files in {dir}.")
+        if not all_patches:
+            raise ValueError("No patches extracted. Check the input directory and parameters.") 
+        
+    else: 
+        m = re.match(r'.*?_(\d+)_([0-9]+)\.fits', dir)
         if m:
-            obsid=m.group(1)
             scaid=m.group(2)
-        
-        if int(obsid) not in skip_obs:
-            nfiles+=1
-            with fits.open(filepath) as hdul:
-                image = hdul[0].data.astype(np.float32)
-                patches = extract_patches_from_image(image, patch_size, stride, scaid=scaid, science=science, mask_path=mask_path)
-                all_patches.extend(patches)
-        
-    print(f"Extracted {len(all_patches)} patches from {nfiles} files in {dir}.")
-    if not all_patches:
-        raise ValueError("No patches extracted. Check the input directory and parameters.") 
+        with fits.open(dir) as hdul:
+            image = hdul['SCI'].data.astype(np.float32)
+            patches = extract_patches_from_image(image, scaid, patch_size, stride, science=science, mask_path=mask_path)
+            all_patches.extend(patches)
     
     return np.array(all_patches)
 
@@ -175,8 +187,8 @@ class Patches:
             self.patch_size, 
             self.stride, 
             self.max_files,
-            science=self.science
-            mask_path=self.mask_path
+            science=self.science,
+            mask_path=self.mask_path,
             skip_obs=self.skip_obs)
 
         return self.patches
