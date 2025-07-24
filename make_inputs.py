@@ -14,7 +14,7 @@ Parameters:
     out_dir (str): Directory where the output summed image will be saved.
 """
 
-sci_path_prefix = '/fs/scratch/PCON0003/cond0007/anl-run-in-prod/simple/Roman_WAS_simple_model_670_'
+sci_path_prefix = '/fs/scratch/PCON0003/cond0007/anl-run-in-prod/simple/Roman_WAS_simple_model_H158_670_'
 noise_dir = '/fs/scratch/PCON0003/cond0007/anl-run-in-prod/labnoise'
 out_dir = '/fs/scratch/PCON0003/klaliotis/noise-aed/inputs'
 
