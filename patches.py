@@ -50,7 +50,9 @@ def extract_patches_from_image(image, scaid, patch_size=64, stride=32, normalize
         patches (list of 2D np.ndarrays)
     """
     patches = []
-    assert image.shape == (4096, 4224), "Image must be 4096x4224 pixels. Current shape: {}".format(image.shape)
+    if image.shape == (4096, 4224):
+        image = image[4:4092, 4:4092] # Crop to 4088x4088
+    nrows, ncols = image.shape
 
     if mask_path:
         mask = fits.open(mask_path)[0].data[int(scaid) - 1].astype(bool)
@@ -59,9 +61,6 @@ def extract_patches_from_image(image, scaid, patch_size=64, stride=32, normalize
 
     if science:
         image = apply_object_mask(image, inplace=False)[0]
-
-    image = image[4:4092, 4:4092] # Crop to 4088x4088
-    nrows, ncols = image.shape
 
     for i in range(0, nrows - patch_size + 1, stride):
         for j in range(0, ncols - patch_size + 1, stride):
