@@ -17,50 +17,54 @@ Parameters:
 sci_path_prefix = '/fs/scratch/PCON0003/cond0007/anl-run-in-prod/simple/Roman_WAS_simple_model_H158_670_'
 noise_dir = '/fs/scratch/PCON0003/cond0007/anl-run-in-prod/labnoise'
 out_dir = '/fs/scratch/PCON0003/klaliotis/noise-aed/inputs'
+obs_include = [670, 13908]
 
-for i in range(1,19):
-    sci_filename = sci_path_prefix + str(i) + '.fits'
-    basename = os.path.basename(sci_filename)
+for obs in obs_include:
+    obsid=str(obs)
 
-    match = re.search(r'(670)_(1[0-9]|[1-9])\.fits$', basename)
-    if not match:
-        raise ValueError(f"No 'number_number' pattern found in filename: {basename}")
-    pattern = f"{match.group(1)}_{match.group(2)}"
+    for i in range(1,19):
+        sci_filename = sci_path_prefix + str(i) + '.fits'
+        basename = os.path.basename(sci_filename)
 
-    # Search for matching file in noise_dir
-    matched_file = None
-    for fname in os.listdir(noise_dir):
-        if pattern in fname and fname.endswith('.fits'):
-            matched_file = os.path.join(noise_dir, fname)
-            break
+        match = re.search(fr'({obsid})_(1[0-9]|[1-9])\.fits$', basename)
+        if not match:
+            raise ValueError(f"No 'number_number' pattern found in filename: {basename}")
+        pattern = f"{match.group(1)}_{match.group(2)}"
 
-    print(f"Matched file: {matched_file} for pattern {pattern} in basename {basename}")
+        # Search for matching file in noise_dir
+        matched_file = None
+        for fname in os.listdir(noise_dir):
+            if pattern in fname and fname.endswith('.fits'):
+                matched_file = os.path.join(noise_dir, fname)
+                break
 
-    if matched_file is None:
-        print(f"Warning: No matching file found in {noise_dir} for pattern {pattern}. Skipping.")
-        continue  # skip to the next iteration
+        print(f"Matched file: {matched_file} for pattern {pattern} in basename {basename}")
 
-    with fits.open(sci_filename) as hdul1, fits.open(matched_file) as hdul2:
-        sci = hdul1['SCI'].data.astype(np.float32)
-        noise = hdul2['PRIMARY'].data.astype(np.float32)[4:4092, 4:4092] * 1.458 * 50  # gain * N_frames
-        header = hdul1[0].header
+        if matched_file is None:
+            print(f"Warning: No matching file found in {noise_dir} for pattern {pattern}. Skipping.")
+            continue  # skip to the next iteration
 
-    # Sum the images
-    summed = sci + noise
+        with fits.open(sci_filename) as hdul1, fits.open(matched_file) as hdul2:
+            sci = hdul1['SCI'].data.astype(np.float32)
+            noise = hdul2['PRIMARY'].data.astype(np.float32)[4:4092, 4:4092] * 1.458 * 50  # gain * N_frames
+            header = hdul1[0].header
 
-    # Create HDUs
-    primary_hdu = fits.PrimaryHDU(summed, header=header)
-    sci_hdu = fits.ImageHDU(sci, name='SCI')
-    noise_hdu = fits.ImageHDU(noise, name='NOISE')
+        # Sum the images
+        summed = sci + noise
 
-    # Combine into HDUList
-    hdulist = fits.HDUList([primary_hdu, sci_hdu, noise_hdu])
+        # Create HDUs
+        primary_hdu = fits.PrimaryHDU(summed, header=header)
+        sci_hdu = fits.ImageHDU(sci, name='SCI')
+        noise_hdu = fits.ImageHDU(noise, name='NOISE')
 
-    # Write out the file
-    out_name = f"Roman_WAS_Noise_H158_{pattern}.fits"
-    out_path = os.path.join(out_dir, out_name)
-    hdulist.writeto(out_path, overwrite=True)
+        # Combine into HDUList
+        hdulist = fits.HDUList([primary_hdu, sci_hdu, noise_hdu])
 
-    print(f"Saved summed image to {out_path}")
+        # Write out the file
+        out_name = f"Roman_WAS_Noise_H158_{pattern}.fits"
+        out_path = os.path.join(out_dir, out_name)
+        hdulist.writeto(out_path, overwrite=True)
+
+        print(f"Saved summed image to {out_path}")
 
 
