@@ -65,7 +65,7 @@ pmask_path = "/users/PCON0003/cond0007/imcom/coadd-test-fall2022/permanent_mask_
 skip_obs = [670]
 patch_size = 128
 stride = 64
-max_files = None
+max_files = 10
 
 print("Extracting noise patches from darks...")
 
