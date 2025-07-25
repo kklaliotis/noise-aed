@@ -183,10 +183,10 @@ class Patches:
     
     def extract(self):
         self.patches = load_fits_images_and_extract_patches(
-            self.dir, 
-            self.patch_size, 
-            self.stride, 
-            self.max_files,
+            dir=self.dir, 
+            patch_size=self.patch_size, 
+            stride=self.stride, 
+            max_files=self.max_files,
             science=self.science,
             mask_path=self.mask_path,
             skip_obs=self.skip_obs)
