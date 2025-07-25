@@ -9,6 +9,8 @@ from torch.utils.data import Dataset, DataLoader
 import torch.optim as optim
 import numpy as np
 from patches import Patches
+import cProfile
+import pstats
 
 class ConvAutoencoder(nn.Module):
     """
@@ -177,4 +179,13 @@ def main():
     print("All science images processed. Complete!!")
 
 if __name__ == '__main__':
-    main()
+    profiler = cProfile.Profile()
+    profiler.enable()
+    try:
+        main()
+    finally:
+        profiler.disable()
+        with open("profile_results.txt", "w") as f:
+            stats = pstats.Stats(profiler, stream=f).sort_stats('cumulative')
+            stats.print_stats(50)
+        
