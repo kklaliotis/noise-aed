@@ -166,8 +166,9 @@ for file in files:
             # Save the reconstructed image
             output_file = f"{obsid}_{scaid}_aeds.fits"
             hdu = fits.PrimaryHDU(original_image-reconstructed_image)
-            hdu2 = fits.ImageHDU(reconstructed_image)
-            hdul = fits.HDUList([hdu, hdu2])
+            hdu2 = fits.ImageHDU(reconstructed_image, name='RECONSTRUCTED')
+            hdu3 = fits.ImageHDU(original_image, name='ORIGINAL')
+            hdul = fits.HDUList([hdu, hdu2, hdu3])
             hdul.writeto(output_file, overwrite=True)
             print(f"Reconstructed image saved to {output_file}")
 
